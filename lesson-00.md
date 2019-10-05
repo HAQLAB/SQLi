@@ -45,24 +45,28 @@ Let's see the query that is created :
   SELECT * FROM pages WHERE id = 1'
 ```
 
-The DBMS was expecting an ending quote ' that is not present and this produce a
+The DBMS was expecting an ending quote ' that is not present and produces a
 syntax error.
+
 This is useful to understand that what we are injecting in the query was
 interpreted as part of the SQL statement and not just as value that `id` should
 have.
+
 Therefore we can try to insert more complex SQL statements to see what happens:
 Let's try with `$_GET[id] = 1 OR 1=1`, the query produced will be:
 ```
   SELECT * FROM pages WHERE id = 1 OR 1=1
 ```
 
-BOOM! The produced query is legal and we will get all the pages from the DB.
+BOOM! The resulting query is legal and we will get all the pages from the DB.
 
 The technique is basically the same if the argument is surrounded by quotes,
-we just have to break the string in SQL, inject our code and be careful that the syntax is legal.
+we just have to break the string in SQL, inject our code and be careful that the
+syntax is legal.
 
 #### Example 0.2
 Given this PHP code:
+
 We have just introduced the surrounding single quotes `'` in the SQL
 statement (the double quotes `"` are the PHP string delimiters).
 ```php
@@ -86,14 +90,14 @@ If we use `$_GET[id] = 1' OR 1=1`, the query produced will be:
 ```
 and we will get an SQL syntax error (and ending quote is missing).
 But we can inject multiple quotes :)
-Let's try with `$_GET[id] = 1' OR '1'='1` (please note the missing ending quote)
 
+Let's try with `$_GET[id] = 1' OR '1'='1` (please note the missing ending quote).
 It will produce:
 ```
   SELECT * FROM pages WHERE id = '1' OR '1'='1'
 ```
 
-BOOM! The produced query is legal and we will get all the pages from the DB.
+BOOM! The resulting query is legal and we will get all the pages from the DB.
 
 ## LOGIN BYPASS
 The technique described in the previous chapter can be useful to bypass login
@@ -116,12 +120,13 @@ Given this PHP code:
 
 ```
 If we use `$_GET['username'] = admin` and `$_GET['password'] = password` the
-query produced will be:
+resulting query will be:
 ```
   SELECT * FROM users WHERE username = 'admin' AND password = 'password'
 ```
 The code will check if the resulting number of rows is greater than 1, so we
 need a way to alter this condition.
+
 We will try to use `$_GET['password'] = password' OR '1'='1` for the user
 `admin`.
 The query produced will be:
