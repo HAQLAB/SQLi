@@ -320,29 +320,53 @@ database.
 
 
 ### NESTED QUERIES
+A subquery is a SQL query nested inside a larger query. This is useful when
+we need data from other tables in the current query.
+A basic example of nested query is the following:
+```
+SELECT * FROM users WHERE role NOT IN (SELECT id FROM administration_roles);
+```
+This query will execute a first query on `administration_roles` to get a list
+of ids and then will execute the second query that will select all users with
+a role that is not one of the `administration_roles`.
 
+We are using the result of a query as a parameter for another one.
 
+We can also use this feature in our injections.
+
+#### Example 0.7
+Given this PHP code:
+```php
+
+  $sql = "SELECT * FROM users
+          WHERE username = '" . $_GET['username'] . "'
+          AND password = '" . $_GET['password'] . "'";
+  $result = mysqli_query($conn, $sql);
+  $row_count = mysqli_num_rows($result);
+  if ($row_count != 0) {
+    echo 'Authorized';
+  } else {
+    echo 'Not authorized';
+  }
+```
+we can use a nested query on the password parameter to get the password itself
+(we also have to insert some comments to have a legal statement):
+```
+  $_GET['username'] = admin
+  $_GET['password'] = '+(SELECT password FROM users WHERE username='admin') -- -;
+```
+will produce:
+```
+  SELECT * FROM users WHERE username = 'admin' AND password = ''+(SELECT password from users WHERE username='admin') -- -';
+```
 
 ### REAL LIFE EXAMPLES
 
 ### UNSAFE EXAMPLES
 
 ### SAFE EXAMPLES
-The magic_quotes( ), addslashes( ), and mysql_real_escape_string( ) filters cannot completely
-p ­ revent the presence or exploitation of an SQL injection vulnerability.
+The magic_quotes( ), addslashes( ), and mysql_real_escape_string( ) filters
+cannot completely prevent the presence or exploitation of an SQL injection
+vulnerability.
 
 ### TOOL
-
-
-##### Common MySQL Errors
-
-```
-Warning: mysql_fetch_array(): supplied argument is not a valid MySQL result
-resource in /var/www/victim.com/showproduct.php on line 8
-
-Error: You have an error in your SQL syntax; check the manual that
-corresponds to your MySQL server version for the right syntax to use near
-''' at line 1
-
-Error: Unknown column 'attacker' in 'where clause'
-```
