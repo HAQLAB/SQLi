@@ -5,17 +5,7 @@
 It is important when we discover an injection to identify the database that we
 are dealing with in order to use the best approach.
 
-The first hint will be provided by the application.
-Usually a PHP will use a MySQL database, an ASP or .NET application a MSSQL
-database.
-A JAVA app probably is configured to use MySQL or Oracle.
-Also the Operating System can give you some hints:
-
-- a Microsoft server usually use a MSSQL database
-- a Linux server usually use a MySQL database
-
-__This is not a rule!__ We have some technique to be sure when we are dealing with
-a non-blind situation (or not).
+We have some technique to be sure when we are dealing with a blind or non-blind situation.
 
 - __Cause an error__: the error message will be different for each DBMS (non-blind)
 - __Banner grabbing__: exploit the injection to get the DB version (non-blind)
@@ -298,3 +288,5 @@ __LEARN BY HEART!!!!__
 | Hostname, IP | `SELECT @@hostname;` |
 
 __LEARN BY HEART!!!!__
+
+## DEMO to extract tables and columns
