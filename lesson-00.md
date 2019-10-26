@@ -97,7 +97,7 @@ It will produce:
 
 BOOM! The resulting query is legal and we will get all the pages from the DB.
 
-## LOGIN BYPASS
+## 'LOGIN BYPASS
 The technique described in the previous chapter can be useful to bypass login
 screens.
 
@@ -136,7 +136,7 @@ Because of that the resulting number of rows will be greater than `1` and we
 can access to the authenticated part of code.
 
 
-### COMMENTS
+## 'COMMENTS
 
 Sometimes happens that we can inject code only in the middle of the query,
 and this prevents us from append some condition like we did in the previous example.
@@ -180,7 +180,7 @@ Comments in SQL code are similar to comments in any other programming language.
 They are used to insert information in the code and they are ignored by the
 interpreter.
 
-#### Database comments
+### Database comments
 Database | Comment | Note
 --- | --- | ---
 MSSQL / Oracle | `-- (double dash)` | Used for single-line comments
@@ -266,7 +266,7 @@ Removing commented code:
 ```
 BOOM!
 
-### STACKED QUERIES
+## 'STACKED QUERIES
 Terminating an SQL statement in an arbitrary way allow us to have a great
 control on what the DBMS will execute.
 For example in Microsoft SQL Server 6.0 were introduced server-side cursors
@@ -319,7 +319,7 @@ If we can execute stacked queries we can virtually execute any kind of query on
 database.
 
 
-### NESTED QUERIES
+## 'NESTED QUERIES
 A subquery is a SQL query nested inside a larger query. This is useful when
 we need data from other tables in the current query.
 A basic example of nested query is the following:
@@ -359,14 +359,3 @@ will produce:
 ```
   SELECT * FROM users WHERE username = 'admin' AND password = ''+(SELECT password from users WHERE username='admin') -- -';
 ```
-
-### REAL LIFE EXAMPLES
-
-### UNSAFE EXAMPLES
-
-### SAFE EXAMPLES
-The magic_quotes( ), addslashes( ), and mysql_real_escape_string( ) filters
-cannot completely prevent the presence or exploitation of an SQL injection
-vulnerability.
-
-### TOOL

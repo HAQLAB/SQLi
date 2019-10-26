@@ -252,7 +252,7 @@ We will get:
 | 1 | 2 | 3 |
 
 
-## CHEATSHEET (to weaponize)
+## 'CHEATSHEET (to weaponize)
 
 We have just learned how to get other data using `UNION` exploiting an SQL Injection.
 But how can we discover if there are some other tables? What are the names of the columns? We are DBA?
