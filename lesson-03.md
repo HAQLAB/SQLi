@@ -24,7 +24,7 @@ CREATE TABLE `users` (user char(50));
 LOAD DATA INFILE '/etc/passwd' INTO TABLE `users`;
 ```
 This code creates a table `users` with one column `user` and populates it
-from the file `/etc/passwd`. `LOAD DATA INFILE` reads data froma text file into
+from the file `/etc/passwd`. `LOAD DATA INFILE` reads data from text file into
 a table.
 
 ```sql
