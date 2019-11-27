@@ -68,7 +68,7 @@ const connection = mysql.createConnection({
 
 // execute will internally call prepare and query
 connection.execute(
-  'SELECT * FROM `memes` WHERE `id` = ? AND `category` > ?',
+  'SELECT * FROM `memes` WHERE `id` = ? AND `category` = ?',
   [51, 'cybersec'],
   function(err, results, fields) {
     console.log(results); // results contains rows returned by server
